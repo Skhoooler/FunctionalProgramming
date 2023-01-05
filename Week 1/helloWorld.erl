@@ -1,0 +1,7 @@
+-module(helloWorld).
+-export([hello/0, average/2]).
+
+hello() -> io:format("Hello World!~n").
+
+average(Number1, Number2) -> (Number1 + Number2) / 2.
+
