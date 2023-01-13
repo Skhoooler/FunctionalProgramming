@@ -25,14 +25,18 @@ head([Head | _]) -> Head.
 
 % Problem 1.4
 tail([]) -> nil;
-tail([ Head | nil ]) -> Head;
-tail([ _ | Body]) -> tail(Body).
+tail(List) when length(List) == 1 -> head(List);
+tail([ _ | Body]) -> tail(Body). %[1, 2, 3, 4]
 
 % Problem 2.1
-
+remove_first([]) -> [];
+remove_first([_|Body]) -> Body.
 
 % Problem 2.2
-
+insert_at(List, _Value, Index) when Index < 0 -> List;
+insert_at(List, Value, 0) -> [Value | List];
+insert_at([], Value, _Index) -> [];
+insert_at([First | Rest], Value, Index) -> [First | insert_at(Rest, Value, Index - 1)].
 
 % Problem 2.3
 
@@ -87,7 +91,6 @@ test_ps1() ->
     % Test Problem 1.4
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     4 = tail([1,2,3,4]),
-    io:format("Hello World!~n"),
     nil = tail([]),
 
     ok.
@@ -99,20 +102,20 @@ test_ps2() ->
     % Test Problem 2.1
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    %[2,3,4] = remove_first([1,2,3,4]),
-    %[] = remove_first([]),
+    [2,3,4] = remove_first([1,2,3,4]),
+    [] = remove_first([]),
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 2.2
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    %[0,1,2,3,4] = insert_at([1,2,3,4], 0, 0),
-    %[1,0,2,3,4] = insert_at([1,2,3,4], 0, 1),
-    %[1,2,3,0,4] = insert_at([1,2,3,4], 0, 3),
-    %[1,2,3,4,0] = insert_at([1,2,3,4], 0, 4),
-    %[1,2,3,4] = insert_at([1,2,3,4], 0, 5),
-    %[1,2,3,4] = insert_at([1,2,3,4], 0, -1),
-    %[0] = insert_at([], 0, 0),
+    [0,1,2,3,4] = insert_at([1,2,3,4], 0, 0),
+    [1,0,2,3,4] = insert_at([1,2,3,4], 0, 1),
+    [1,2,3,0,4] = insert_at([1,2,3,4], 0, 3),
+    [1,2,3,4,0] = insert_at([1,2,3,4], 0, 4),
+    [1,2,3,4] = insert_at([1,2,3,4], 0, 5),
+    [1,2,3,4] = insert_at([1,2,3,4], 0, -1),
+    [0] = insert_at([], 0, 0),
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 2.3
