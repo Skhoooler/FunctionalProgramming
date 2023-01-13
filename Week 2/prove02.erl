@@ -25,7 +25,7 @@ head([Head | _]) -> Head.
 
 % Problem 1.4
 tail([]) -> nil;
-tail([Head | Body]) when nil = Body -> Head;
+tail([ Head | nil ]) -> Head;
 tail([ _ | Body]) -> tail(Body).
 
 % Problem 2.1
@@ -86,8 +86,8 @@ test_ps1() ->
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 1.4
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
-
     4 = tail([1,2,3,4]),
+    io:format("Hello World!~n"),
     nil = tail([]),
 
     ok.
