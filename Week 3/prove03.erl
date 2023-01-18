@@ -18,7 +18,7 @@ map(Lambda, [First | Rest]) -> [Lambda(First) | map(Lambda, Rest)].
 
 % Problem 1.3
 map_2(_Lambda, []) -> [];
-map_2(Lambda, Data) -> [X || X <- Data, Lambda(X), X].
+map_2(Lambda, Data) -> [X || X <- Data, Lambda(X)].
 
 % Problem 2.1
 
