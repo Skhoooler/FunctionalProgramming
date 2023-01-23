@@ -17,14 +17,18 @@ map(_Lambda, []) -> [];
 map(Lambda, [First | Rest]) -> [Lambda(First) | map(Lambda, Rest)].
 
 % Problem 1.3
-map_2(_Lambda, []) -> [];
-map_2(Lambda, Data) -> [X || X <- Data, Lambda(X)].
+map_2(Lambda, Data) -> [Lambda(X) || X <- Data].
 
 % Problem 2.1
-
+filter(_Lambda, []) -> [];
+filter(Lambda, [First | Rest]) -> 
+    case Lambda(First) of
+        true -> [First | filter(Lambda, Rest)];
+        _    -> filter(Lambda, Rest)
+    end.
 
 % Problem 2.2
-
+filter_2(Lambda, Data) -> [X || X <- Data, Lambda(X) == true].
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -73,17 +77,18 @@ test_ps2() ->
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % Modify the test code below to get the even numbers from a list using filter
-    %Numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-    %Even_Lambda = put_your_lambda_function_here,
-    %Even_Numbers = use_filter_function_here
-    %[2, 4, 6, 8, 10] = Even_Numbers,
+    Numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    Even_Lambda = fun(Integer) -> Integer rem 2 == 0 end,
+    Even_Numbers = filter(Even_Lambda, Numbers),
+    [2, 4, 6, 8, 10] = Even_Numbers,
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 2.2
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % Write test code below to get the even numbers from a list using filter2
-
+    Even_Numbers_2 = filter_2(Even_Lambda, Numbers),
+    [2, 4, 6, 8, 10] = Even_Numbers_2,
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -91,7 +96,12 @@ test_ps2() ->
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % Modify the test code to get liquid temperatures from a list using filter
-	%[20, 80] = filter(put_your_lambda_function_here, [-10, 20, -15, 110, 80]),
+    Is_Water_Lambda = fun(Temp) ->
+        case Temp of 
+            Temp when Temp > 0, Temp < 100  -> true;
+            _ -> false end 
+        end,
+	[20, 80] = filter(Is_Water_Lambda, [-10, 20, -15, 110, 80]),
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 2.4
@@ -109,8 +119,15 @@ test_ps2() ->
 
     % Write test code using the Messages variable above to get only
     % ERROR messages using filter.
+    Error_Lambda = fun(String) -> string:prefix("ERROR", String) == "nomatch" end,
 
-
+    Messages = ["INFO: Reading the data",
+        "INFO: Validating the data",
+        "WARNING: Missing meta data",
+        "WARNING: Row 12 unexpected line terminator",
+        "INFO: Validation complete",
+        "INFO: Processing data",
+        "INFO: Processing complete"] = filter(Error_Lambda, Messages),
     
     ok.
 
