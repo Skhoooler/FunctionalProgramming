@@ -119,15 +119,16 @@ test_ps2() ->
 
     % Write test code using the Messages variable above to get only
     % ERROR messages using filter.
-    Error_Lambda = fun(String) -> string:prefix("ERROR", String) == "nomatch" end,
+    Error_Lambda = fun(String) -> string:prefix("E", String) /= "nomatch" end,
 
-    Messages = ["INFO: Reading the data",
+    Messages = [
+        "INFO: Reading the data",
         "INFO: Validating the data",
         "WARNING: Missing meta data",
         "WARNING: Row 12 unexpected line terminator",
         "INFO: Validation complete",
         "INFO: Processing data",
-        "INFO: Processing complete"] = filter(Error_Lambda, Messages),
+        "INFO: Processing complete"] = filter_2(Error_Lambda, Messages),
     
     ok.
 
@@ -139,6 +140,10 @@ test_ps3() ->
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % Write test code to demonstrate the identity for filter
+    Identity_List = [1, 2, 3 , 4 ,5],
+    Identity_Lambda = fun(Num) -> Num =:= Num end,
+
+    Identity_List = filter(Identity_Lambda, Identity_List),
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
