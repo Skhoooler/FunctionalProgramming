@@ -119,7 +119,7 @@ test_ps2() ->
 
     % Write test code using the Messages variable above to get only
     % ERROR messages using filter.
-    Error_Lambda = fun(String) -> string:prefix("E", String) /= "nomatch" end,
+    Error_Lambda = fun(String) -> string:prefix(String, "ERROR:") /= nomatch end,
 
     Messages = [
         "INFO: Reading the data",
@@ -140,7 +140,7 @@ test_ps3() ->
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % Write test code to demonstrate the identity for filter
-    Identity_List = [1, 2, 3 , 4 ,5],
+    Identity_List = [1, 2, 3, 4, 5],
     Identity_Lambda = fun(Num) -> Num =:= Num end,
 
     Identity_List = filter(Identity_Lambda, Identity_List),
@@ -151,7 +151,12 @@ test_ps3() ->
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % Write test code to demonstrate the distributive property for filter
+    G = fun(Value) -> 100 + Value end,
+    H = fun(Value) -> 5 * Value end,
 
+    G_H = fun(Value) -> G(H(Value)) end,
 
+    [105, 110, 115, 120] = map(G_H, [1, 2, 3, 4]),
+    [105, 110, 115, 120] = map(G, map(H, [1, 2, 3, 4])),
 
     ok.
