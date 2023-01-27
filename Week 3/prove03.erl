@@ -122,13 +122,8 @@ test_ps2() ->
     Error_Lambda = fun(String) -> string:prefix(String, "ERROR:") /= nomatch end,
 
     Messages = [
-        "INFO: Reading the data",
-        "INFO: Validating the data",
-        "WARNING: Missing meta data",
-        "WARNING: Row 12 unexpected line terminator",
-        "INFO: Validation complete",
-        "INFO: Processing data",
-        "INFO: Processing complete"] = filter_2(Error_Lambda, Messages),
+        "ERROR: Column 2 Row 5 expected number",
+        "ERROR: Command 7 unknown"] = filter_2(Error_Lambda, Messages),
     
     ok.
 
