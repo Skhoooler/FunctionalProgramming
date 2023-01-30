@@ -1,5 +1,5 @@
 -module(challenge).
--export([test/0, extract_numbers/1]).
+-export([test/0, check_dominos/1]).
 
 % If there is an even number of each number, true
 % else, false
@@ -9,7 +9,7 @@ extract_numbers([{First, Second} | T]) -> [First] ++ [Second] ++ extract_numbers
 
 add_matching_numbers(_Previous, []) -> [];
 add_matching_numbers(Previous, [First | T]) when Previous =:= First-> [Previous + First | add_matching_numbers(First, T)];
-add_matching_numbers(Previous, [First | T]) -> add_matching_numbers(First, T).
+add_matching_numbers(_Previous, [First | T]) -> add_matching_numbers(First, T).
 
 
 check_dominos(Dominos) -> 
@@ -17,13 +17,16 @@ check_dominos(Dominos) ->
     Sorted_Numbers = lists:sort(All_Numbers),
     Accumulated_Numbers = add_matching_numbers(0, Sorted_Numbers) ,
 
-    Filter_Lambda = fun(Num) -> Num rem 2 == true end,
+    Filter_Lambda = fun(Num) -> Num rem 2 == 0 end,
     Result = lists:filter(Filter_Lambda, Accumulated_Numbers),
-    
-    case length(Accumulated_Numbers) =:= length(Result) of 
-        true -> true;
-        _Else -> false
-    end.
+
+    Result.
+
+    % Still working on the logic of this part
+    %case length(Accumulated_Numbers) =:= length(Result) of 
+    %    true -> true;
+    %    _ -> false
+    %end.
 
 test() ->
     Test_1 = [{1, 3}, {3, 2}, {2, 1}], % Already in order
