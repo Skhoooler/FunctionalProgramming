@@ -13,7 +13,7 @@
 -export([test_ps1/0, test_ps2/0, test_ps3/0]).
 
 % Problem 1.2
-
+greater_list(N) -> ok.
 
 % Problem 1.3
 % Provide specification and definition (as comments) along with the code
@@ -110,15 +110,19 @@ test_ps1() ->
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % Chain the map, filter, and foldl functions in a single line as described in the problem
-
+    Values_1_1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    Map_lambda = fun(X) -> X * 3 end,
+    Filter_lambda = fun(X) -> X rem 2 == 0 end,
+    Foldl_lambda = fun(X, Acc) -> X * Acc end,
+    933120 = lists:foldl(Foldl_lambda, 1, lists:filter(Filter_lambda, lists:map(Map_lambda, Values_1_1))),
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 1.2
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     L = [2, 4, 6, 8, 10, 12],
-    %[12,16,20,24] = (greater_list(10))((multiply_list(2))(L)),
-    %[24] = (multiply_list(2))((greater_list(10))(L)),
+    [12,16,20,24] = (greater_list(10))((multiply_list(2))(L)),
+    [24] = (multiply_list(2))((greater_list(10))(L)),
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 1.3
