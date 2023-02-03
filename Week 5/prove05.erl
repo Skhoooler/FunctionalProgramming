@@ -13,11 +13,16 @@
 -export([test_ps1/0, test_ps2/0, test_ps3/0]).
 
 % Problem 1.2
-greater_list(N) -> ok.
+multiply_list(Value) -> fun(List) -> lists:map(fun(Item) -> Value * Item end, List) end.
+
+greater_list(N) -> fun(List) -> lists:filter(fun(Item) -> Item > N end, List) end.
 
 % Problem 1.3
 % Provide specification and definition (as comments) along with the code
- 
+% spec multiple_of_list :: real -> (lambda :: [real] -> [real]).
+% spec lambda_filter :: real -> real.
+% def multiple_of_list :: Value -> (lambda :: List -> (filter(lambda_filter :: Item -> Item rem Value == 0 end , List)).
+multiples_of_list(Value) -> fun(List) -> lists:filter(fun(Item) -> Item rem Value == 0 end, List) end.
 
 % Problem 2.1
 
@@ -128,9 +133,9 @@ test_ps1() ->
     % Test Problem 1.3
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    %Multiples7 = multiples_of_list(7),
-    %[7,14,21,28] = Multiples7(lists:seq(1,30)),
-    %[42,49] = Multiples7(lists:seq(40,50)),
+    Multiples7 = multiples_of_list(7),
+    [7,14,21,28] = Multiples7(lists:seq(1,30)),
+    [42,49] = Multiples7(lists:seq(40,50)),
 
 
     ok.
