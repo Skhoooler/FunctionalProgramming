@@ -10,7 +10,7 @@
 % When writing tests use the `expected_result` = `actual result` format.
 
 -module(prove05).
--export([test_ps1/0, test_ps2/0, test_ps3/0]).
+-export([test_ps1/0, test_ps2/0, test_ps3/0, test_curry/0]).
 
 % Problem 1.2
 multiply_list(Value) -> fun(List) -> lists:map(fun(Item) -> Value * Item end, List) end.
@@ -26,11 +26,25 @@ multiples_of_list(Value) -> fun(List) -> lists:filter(fun(Item) -> Item rem Valu
 
 % Problem 2.1
 
+% Implemented the curry function above test_ps2()
+
 
 % Problem 3.1
-
+map_filter_fold2(Value) ->
+    List = lists:seq(1, Value),
+    fun (MapL) -> 
+        MapList = lists:map(MapL, List),
+        fun (FilterL) ->
+            FilterList = lists:filter(FilterL, MapList),
+            fun (FoldInit, FoldL) ->
+                FoldResult = lists:foldl(FoldL, FoldInit, FilterList),
+                FoldResult
+            end
+        end
+    end.
 
 % Problem 3.2
+process_dataset2() ->
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -140,6 +154,27 @@ test_ps1() ->
 
     ok.
 
+curry(Function) ->
+    {_, Arity} = erlang:fun_info(Function, arity),
+    curry_helper(Function, Arity, []).
+
+curry_helper(Function, 0, Parameters) -> apply(Function, lists:reverse(Parameters));
+curry_helper(Function, Iteration, Parameters) ->
+    fun(Parameter) -> curry_helper(Function, Iteration - 1, [Parameter] ++ Parameters) end.
+
+test_curry() ->
+    Create_car = fun(Color, Year, Make, Model, Trim) -> Year ++ " " ++ Color ++ " " ++ Make ++ " " ++ Model ++ " " ++ Trim end,
+    
+    Color_ingredient = curry(Create_car),
+    Year_ingredient = Color_ingredient("Blue"),
+    Make_ingredient = Year_ingredient("2001"),
+    Model_ingredient = Make_ingredient("Volkswagen"),
+    Trim_ingredient = Model_ingredient("Bug"),
+    
+    Curried_car = Trim_ingredient("Basic"),
+    Curried_car.
+    
+
 % Test code for problem set 2
 test_ps2() ->
 
@@ -191,43 +226,43 @@ test_ps3() ->
     Product = fun(X,Y) -> X*Y end,
 
     % Example not using any partial applications    
-    %35 = (((map_filter_fold2(6))(Square))(Odd))(0, Sum),
+    35 = (((map_filter_fold2(6))(Square))(Odd))(0, Sum),
     
     % Example creating and using partial application
-    %First10Squares = (map_filter_fold2(10))(Square),
-    %165 = (First10Squares(Odd))(0, Sum),
-    %14745600 = (First10Squares(Even))(1,Product),
+    First10Squares = (map_filter_fold2(10))(Square),
+    165 = (First10Squares(Odd))(0, Sum),
+    14745600 = (First10Squares(Even))(1,Product),
 
     % Write and test a partial application function to obtain the first 20 triples that are even and
 	% test per the instructions.
-    %First20TriplesOnlyEven = write_code_here,
-    %330 = write_code_here,
-    %219419659468800 = write_code_here,
+    First20TriplesOnlyEven = (((map_filter_fold2(20))(Triple))(Even)),
+    330 = First20TriplesOnlyEven(0, Sum),
+    219419659468800 = First20TriplesOnlyEven(1, Product),
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 3.2
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     % Examples not using any partial applications  
-    % Avg_Temp = process_dataset("weather.csv", 6, int, fun list_average/1),
-    % io:format("Avg Temp = ~p~n",[Avg_Temp]), % Answer = 24.8472
-    % Count_Snow = process_dataset("weather.csv", 5, text, list_text_count("Snow")),
-    % io:format("Count Snow = ~p~n",[Count_Snow]), % Answer = 38
+     Avg_Temp = process_dataset("weather.csv", 6, int, fun list_average/1),
+     io:format("Avg Temp = ~p~n",[Avg_Temp]), % Answer = 24.8472
+     Count_Snow = process_dataset("weather.csv", 5, text, list_text_count("Snow")),
+     io:format("Count Snow = ~p~n",[Count_Snow]), % Answer = 38
 
     % Test partial application to read entire dataset only once 
-    % Weather = process_dataset2("weather.csv"),
-    % Avg_WindChill = (Weather(8, int))(fun list_average/1), 
-    % io:format("Avg WindChill ~p~n",[Avg_WindChill]), % Answer = 12.0
-    % Avg_Pressure = (Weather(9,float))(fun list_average/1),
-    % io:format("Avg Pressure ~p~n",[Avg_Pressure]), % Answer = 29.735
+     Weather = process_dataset2("weather.csv"),
+     Avg_WindChill = (Weather(8, int))(fun list_average/1), 
+     io:format("Avg WindChill ~p~n",[Avg_WindChill]), % Answer = 12.0
+     Avg_Pressure = (Weather(9,float))(fun list_average/1),
+     io:format("Avg Pressure ~p~n",[Avg_Pressure]), % Answer = 29.735
 
     % Test partial application to read the entire dataset and extract the 
     % Observation column (column 5; text) only once 
-    % Weather_Obs = Weather(5, text),
-    % Count_Windy = Weather_Obs(list_text_count("Windy")), % Answer = 19
-    % io:format("Count Windy = ~p~n",[Count_Windy]),
-    % Count_Mist = Weather_Obs(list_text_count("Mist")), % Answer = 7
-    % io:format("Count Mist = ~p~n",[Count_Mist]),
+     Weather_Obs = Weather(5, text),
+     Count_Windy = Weather_Obs(list_text_count("Windy")), % Answer = 19
+     io:format("Count Windy = ~p~n",[Count_Windy]),
+     Count_Mist = Weather_Obs(list_text_count("Mist")), % Answer = 7
+     io:format("Count Mist = ~p~n",[Count_Mist]),
     
     
     ok.
