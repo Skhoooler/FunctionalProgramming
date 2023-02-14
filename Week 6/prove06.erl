@@ -21,9 +21,20 @@ combine_accounts({_Owner1, _Id1, Balance1}, {Owner2, Id2, Balance2}) ->
     {Owner2, Id2, Balance1 + Balance2}.
 
 % Problem 1.3
-
+combine_functions(Fun, nil) -> Fun;
+combine_functions(nil, Fun) -> Fun;
+combine_functions(Fun1, Fun2) -> fun(Value) -> Fun2(Fun1(Value)) end. 
 
 % Problem 2.1
+maybe_unit(Value) -> {ok, Value}.
+
+maybe_bind({ok, Value}, Lambda) -> {ok, Lambda(Value)};
+maybe_bind({fail}, _) -> {fail}.
+
+cut_half(Value) when Value rem 2 == 0, Value >= 0 -> 
+    maybe_bind(maybe_unit(Value), fun(Num) -> Num div 2 end);
+cut_half(_Lambda) ->
+    maybe_bind({fail}, fun(Num) -> Num div 2 end).
 
 
 % Problem 2.2
@@ -88,8 +99,8 @@ test_ps1() ->
     A3 = {"Sue", "5851", 500},
 
     % Write test code to demonstrate the associative property with combineAccounts using the 3 accounts above
-    {"Tim","2424",1200} = combine_accounts(A2, A1),
-    {"Tim","2424",1200} = combine_accounts(A3, A2),
+    {"Tim","2424",1200} = combine_accounts(combine_accounts(A2, A1), A3),
+    {"Tim","2424",1200} = combine_accounts(combine_accounts(A3, A2), A1),
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -100,7 +111,7 @@ test_ps1() ->
     A5 = {"George", "5546", 50},
 
     % Write test code using a fold to combine all 5 accounts into one account for Bob (A1)
-    % {"Edward", "8879", 4250} = put_your_foldl_code_here,
+    {"Edward", "8879", 4250} = lists:foldl(fun(X, Sum) -> combine_accounts(X, Sum) end, A1, [A2, A3, A4, A5]),
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -112,11 +123,11 @@ test_ps1() ->
     F3 = fun string:reverse/1,
 
     % Write test code to demonstrate the associate property of combineFunctions using the 3 functions above
-    % Combined_F1 = put_your_code_here,
-    % Combined_F2 = put_your_code_here,
+    Combined_F1 = combine_functions(combine_functions(F1, F2), F3),
+    Combined_F2 = combine_functions(F1, combine_functions(F2, F3)),
 
-    % "FEDCBA" = Combined_F1("   abCDef  "),
-    % "FEDCBA" = Combined_F2("   abCDef  "),
+    "FEDCBA" = Combined_F1("   abCDef  "),
+    "FEDCBA" = Combined_F2("   abCDef  "),
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -124,8 +135,8 @@ test_ps1() ->
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % Write test code to combine all three functions in the previous problem using a foldl per the instructions
-    % All_Combined = put_your_foldl_code_here,
-    % "FEDCBA" = All_Combined("   abCDef  "),
+    All_Combined = fun(Value) -> lists:foldl(fun(Lambda, Acc) -> Lambda(Acc) end, Value,[F1, F2, F3]) end,
+    "FEDCBA" = All_Combined("   abCDef  "),
 
 
     ok.
@@ -137,10 +148,10 @@ test_ps2() ->
     % Test Problem 2.1
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    %{ok,4} = cut_half(8),
-    %{fail} = cut_half(5),
-    %{fail} = cut_half(-1),
-    %{ok,50} = maybe_bind(maybe_bind(maybe_unit(200), fun cut_half/1), fun cut_half/1),
+    {ok,4} = cut_half(8),
+    {fail} = cut_half(5),
+    {fail} = cut_half(-1),
+    {ok,50} = maybe_bind(maybe_bind(maybe_unit(200), fun cut_half/1), fun cut_half/1),
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 2.2
