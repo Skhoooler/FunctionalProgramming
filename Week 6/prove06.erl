@@ -28,14 +28,11 @@ combine_functions(Fun1, Fun2) -> fun(Value) -> Fun2(Fun1(Value)) end.
 % Problem 2.1
 maybe_unit(Value) -> {ok, Value}.
 
-maybe_bind({ok, Value}, Lambda) -> {ok, Lambda(Value)};
-maybe_bind({fail}, _) -> {fail}.
+maybe_bind({ok, Value}, Lambda) -> Lambda(Value);
+maybe_bind({fail}, _Lambda) -> {fail}.
 
-cut_half(Value) when Value rem 2 == 0, Value >= 0 -> 
-    maybe_bind(maybe_unit(Value), fun(Num) -> Num div 2 end);
-cut_half(_Lambda) ->
-    maybe_bind({fail}, fun(Num) -> Num div 2 end).
-
+cut_half(Value) when Value rem 2 == 0, Value > 0 -> maybe_unit(Value div 2);
+cut_half(_Value) -> {fail}.
 
 % Problem 2.2
 % The following 3 check functions already return the Result Monad type as described in the instructions.
@@ -62,6 +59,7 @@ check_length(Password) ->
         length(Password) < 8 -> {error,["Must be at least 8 characters long."]};
         true -> {ok}
     end.
+
 
 
 % Problem 3.1
@@ -141,13 +139,27 @@ test_ps1() ->
 
     ok.
 
+result_unit() -> {ok}.
+%result_unit(Message) -> {error, [Message]}.
+
+result_bind({ok}, Password, Lambda) -> 
+    case Lambda(Password) of
+        {ok} -> result_unit();
+        {error, [ErrorMessage]} -> {error, [ErrorMessage]}
+    end;
+
+result_bind({error, [PreviousError | RemainingErrors]}, Password, Lambda) -> 
+    case Lambda(Password) of 
+        {ok} -> [PreviousError] ++ [RemainingErrors];
+        {error, [NewError]} -> {error, [PreviousError] ++ [RemainingErrors] ++ [NewError]}
+    end.
+
 % Test code for problem set 2
 test_ps2() ->
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 2.1
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
-
     {ok,4} = cut_half(8),
     {fail} = cut_half(5),
     {fail} = cut_half(-1),
@@ -157,17 +169,17 @@ test_ps2() ->
     % Test Problem 2.2
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    %Password1 = "simple",
-    %Result1 = result_bind(result_bind(result_bind(result_unit(), Password1, fun check_mixed_case/1), Password1, fun check_number_exists/1), Password1, fun check_length/1),
-    %io:format("Result1 = ~p~n",[Result1]), % Should show error with all three errors in the list
+    Password1 = "simple",
+    Result1 = result_bind(result_bind(result_bind(result_unit(), Password1, fun check_mixed_case/1), Password1, fun check_number_exists/1), Password1, fun check_length/1),
+    io:format("Result1 = ~p~n",[Result1]), % Should show error with all three errors in the list
 
-    %Password2 = "mostlygood23",
-    %Result2 = result_bind(result_bind(result_bind(result_unit(), Password2, fun check_mixed_case/1), Password2, fun check_number_exists/1), Password2, fun check_length/1),
-    %io:format("Result2 = ~p~n",[Result2]), % Should show error with one error about missing an upper case letter
+    Password2 = "mostlygood23",
+    Result2 = result_bind(result_bind(result_bind(result_unit(), Password2, fun check_mixed_case/1), Password2, fun check_number_exists/1), Password2, fun check_length/1),
+    io:format("Result2 = ~p~n",[Result2]), % Should show error with one error about missing an upper case letter
 
-    %Password3 = "GoodPassword42",
-    %Result3 = result_bind(result_bind(result_bind(result_unit(), Password3, fun check_mixed_case/1), Password3, fun check_number_exists/1), Password3, fun check_length/1),
-    %io:format("Result3 = ~p~n",[Result3]), % Should show ok 
+    Password3 = "GoodPassword42",
+    Result3 = result_bind(result_bind(result_bind(result_unit(), Password3, fun check_mixed_case/1), Password3, fun check_number_exists/1), Password3, fun check_length/1),
+    io:format("Result3 = ~p~n",[Result3]), % Should show ok 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 2.3
