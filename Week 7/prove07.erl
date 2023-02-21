@@ -10,7 +10,7 @@
 % When writing tests use the `expected_result` = `actual result` format.
 
 -module(prove07).
--export([test_ps1/0, test_ps2/0, test_ps3/0, handle_server/0]).
+-export([test_ps1/0, test_ps2/0, test_ps3/0, handle_server/0, handle_running_avg_server/2]).
 
 % Problem 1.1
 % Modify the code below to add the Step parameter per the instructions.
@@ -53,7 +53,8 @@ collect(Stream, Result) -> add_your_code_here.
 handle_server() ->
     receive
         {Client_PID, echo, {Text}} -> Client_PID ! {Text};
-        {Client_PID, add, {X, Y}} -> Client_PID ! {X+Y}
+        {Client_PID, add, {X, Y}} -> Client_PID ! {X+Y};
+        {Client_PID, avg, {List}} -> Client_PID ! {lists:sum(List) / length(List)}
     end,
     handle_server().
 
@@ -61,7 +62,25 @@ start_server() ->
     spawn(prove07, handle_server, []).
 
 % Problem 3.2
+ start_running_avg_server() -> 
+    spawn(prove07, handle_running_avg_server, [0,0]).
 
+handle_running_avg_server(Sum, Count) ->
+    receive
+        {PID, add, {Number}} -> 
+            NewSum = Number + Sum,
+            NewCount = Count + 1,
+            PID ! {NewSum / NewCount},
+            handle_running_avg_server(NewSum, NewCount);
+        {PID, remove, {Number}} -> 
+            NewSum = Sum - Number,
+            NewCount = Count - 1,
+            PID ! {NewSum / NewCount},
+            handle_running_avg_server(NewSum, NewCount);
+        {PID, display, {}} -> 
+            PID ! {Sum/ Count},
+            handle_running_avg_server(Sum, Count)
+    end.
 
 % The following function is used to send
 % commands to your servers for problems 3.1 and 3.2
@@ -136,23 +155,24 @@ test_ps3() ->
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 3.1
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %Server1_PID = start_server(),
-    %"Hello" = send_to_server(Server1_PID, echo, {"Hello"}),
-    %21 = send_to_server(Server1_PID, add, {13, 8}),
-    %25.0 = send_to_server(Server1_PID, avg, {[10,20,30,40]}),
+    Server1_PID = start_server(),
+    "Hello" = send_to_server(Server1_PID, echo, {"Hello"}),
+    21 = send_to_server(Server1_PID, add, {13, 8}),
+    25.0 = send_to_server(Server1_PID, avg, {[10,20,30,40]}),
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 3.2
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %Server2_PID = start_running_avg_server(),
-    %10.0 = send_to_server(Server2_PID, add, {10}),    % 10
-    %15.0 = send_to_server(Server2_PID, add, {20}),    % 10, 20
-    %20.0 = send_to_server(Server2_PID, add, {30}),    % 10, 20, 30
-    %25.0 = send_to_server(Server2_PID, remove, {10}), % 20, 30
-    %30.0 = send_to_server(Server2_PID, add, {40}),    % 20, 30, 40
-    %30.0 = send_to_server(Server2_PID, remove, {30}), % 20, 40
-    %40.0 = send_to_server(Server2_PID, add, {60}),    % 20, 40, 60
-    %42.5 = send_to_server(Server2_PID, add, {50}),    % 20, 40, 60, 50
-    %42.5 = send_to_server(Server2_PID, display, {}),
+    Server2_PID = start_running_avg_server(),
+
+    10.0 = send_to_server(Server2_PID, add, {10}),    % 10
+    15.0 = send_to_server(Server2_PID, add, {20}),    % 10, 20
+    20.0 = send_to_server(Server2_PID, add, {30}),    % 10, 20, 30
+    25.0 = send_to_server(Server2_PID, remove, {10}), % 20, 30
+    30.0 = send_to_server(Server2_PID, add, {40}),    % 20, 30, 
+    30.0 = send_to_server(Server2_PID, remove, {30}), % 20, 40
+    40.0 = send_to_server(Server2_PID, add, {60}),    % 20, 40, 60
+    42.5 = send_to_server(Server2_PID, add, {50}),    % 20, 40, 60, 50
+    42.5 = send_to_server(Server2_PID, display, {}),
 
     ok.
