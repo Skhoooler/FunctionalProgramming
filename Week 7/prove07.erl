@@ -45,7 +45,9 @@ next({_,done}) -> {undefined, done};
 next({_,Lambda}) -> Lambda().
 
 collect(Stream) -> collect(iter(Stream), []).
-collect(Stream, Result) -> add_your_code_here.
+collect(Stream, Result) -> 
+    Value = iter(Stream), % Issues here, how do I get the Value?
+    collect(Stream, Result ++ Value).
 
 
 % Problem 3.1
@@ -144,9 +146,9 @@ test_ps2() ->
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 2.1
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % [2,4,6,8,10] = collect(range(2,10,2)),
+    [2,4,6,8,10] = collect(range(2,10,2)),
     
-    % ["The","cow","jumped","over","the","moon"] = collect(words("The cow jumped over the moon")),
+    ["The","cow","jumped","over","the","moon"] = collect(words("The cow jumped over the moon")),
 
     ok.
 
