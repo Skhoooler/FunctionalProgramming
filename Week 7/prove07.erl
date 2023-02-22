@@ -44,10 +44,18 @@ iter(Stream) -> {undefined, Stream}.
 next({_,done}) -> {undefined, done};
 next({_,Lambda}) -> Lambda().
 
+getValue({Value, _Lambda}) -> Value.
+getLambda({_Value, Lambda}) -> Lambda.
+
 collect(Stream) -> collect(iter(Stream), []).
 collect(Stream, Result) -> 
-    Value = iter(Stream), % Issues here, how do I get the Value?
-    collect(Stream, Result ++ Value).
+    Value = next(Stream),
+    case getLambda(Value) == done of
+        false ->
+            collect(Stream, Result ++ Value);
+        true ->
+            Result;
+    end.
 
 
 % Problem 3.1
