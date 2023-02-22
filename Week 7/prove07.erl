@@ -30,8 +30,8 @@ first_word(Text) ->
 
 words(String) -> 
     {Word, Rest} = first_word(String),
-    fun() when String == "" -> fun() -> {undefined, done} end;  
-       ()-> {Word, words(Rest)}
+    fun() when String == "" -> {undefined, done};  
+       () -> {Word, words(Rest)}
     end.
 
 % Problem 2.1
@@ -136,6 +136,7 @@ test_ps1() ->
     {undefined, done} = Stream20(),
 
     ok.
+
 
 % Test code for problem set 2
 test_ps2() ->
