@@ -13,6 +13,7 @@
 -export([test_ps1/0, test_ps2/0, test_ps3/0]).
 
 % Problem 1.1
+add(New_Value, nil) -> {New_Value, nil, nil};
 add(New_Value, {Node_Value, Left, Right}) when New_Value < Node_Value -> 
     {Node_Value, add(New_Value, Left), Right};
 add(New_Value, {Node_Value, Left, Right}) when New_Value > Node_Value ->
@@ -26,7 +27,7 @@ contains(Value, {Node_Value, Left, _Right}) when Value < Node_Value ->
     contains(Value, Left);
 contains(Value, {Node_Value, _Left, Right}) when Value > Node_Value ->
     contains(Value, Right);
-contains(Value, Node) -> 
+contains(_Value, Node) -> 
     false.
 
 % Problem 2.1
@@ -110,35 +111,35 @@ test_ps2() ->
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 2.1
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %L1 = add_rbt(5, nil),
-    %{black,5,nil,nil} = L1,
+    L1 = add_rbt(5, nil),
+    {black,5,nil,nil} = L1,
 
-    %L2 = add_rbt(3, L1),
-    %{black,5,{red,3,nil,nil},nil} = L2,
+    L2 = add_rbt(3, L1),
+    {black,5,{red,3,nil,nil},nil} = L2,
 
-    %L3 = add_rbt(7, L2),
-    %{black,5,{red,3,nil,nil},{red,7,nil,nil}} = L3,
+    L3 = add_rbt(7, L2),
+    {black,5,{red,3,nil,nil},{red,7,nil,nil}} = L3,
 
-    %L4 = add_rbt(4, L3),
-    %{black,4,{black,3,nil,nil},{black,5,nil,{red,7,nil,nil}}} = L4,
+    L4 = add_rbt(4, L3),
+    {black,4,{black,3,nil,nil},{black,5,nil,{red,7,nil,nil}}} = L4,
     
-    %L5 = add_rbt(2, L4),
-    %{black,4,{black,3,{red,2,nil,nil},nil},{black,5,nil,{red,7,nil,nil}}} = L5,
+    L5 = add_rbt(2, L4),
+    {black,4,{black,3,{red,2,nil,nil},nil},{black,5,nil,{red,7,nil,nil}}} = L5,
 
-    %L6 = add_rbt(6, L5),
-    %{black,4,{black,3,{red,2,nil,nil},nil},{red,6,{black,5,nil,nil},{black,7,nil,nil}}} = L6,
+    L6 = add_rbt(6, L5),
+    {black,4,{black,3,{red,2,nil,nil},nil},{red,6,{black,5,nil,nil},{black,7,nil,nil}}} = L6,
 
-    %L7 = add_rbt(8, L6),
-    %{black,4,{black,3,{red,2,nil,nil},nil},{red,6,{black,5,nil,nil},{black,7,nil,{red,8,nil,nil}}}} = L7,
+    L7 = add_rbt(8, L6),
+    {black,4,{black,3,{red,2,nil,nil},nil},{red,6,{black,5,nil,nil},{black,7,nil,{red,8,nil,nil}}}} = L7,
 
-    %L8 = add_rbt(10, L7), 
-    %{black,6,{black,4,{black,3,{red,2,nil,nil},nil},{black,5,nil,nil}},{black,8,{black,7,nil,nil},{black,10,nil,nil}}} = L8,
+    L8 = add_rbt(10, L7), 
+    {black,6,{black,4,{black,3,{red,2,nil,nil},nil},{black,5,nil,nil}},{black,8,{black,7,nil,nil},{black,10,nil,nil}}} = L8,
 
-    %L9 = add_rbt(1, L8), 
-    %{black,6,{black,4,{red,2,{black,1,nil,nil},{black,3,nil,nil}},{black,5,nil,nil}},{black,8,{black,7,nil,nil},{black,10,nil,nil}}} = L9,
+    L9 = add_rbt(1, L8), 
+    {black,6,{black,4,{red,2,{black,1,nil,nil},{black,3,nil,nil}},{black,5,nil,nil}},{black,8,{black,7,nil,nil},{black,10,nil,nil}}} = L9,
 
-    %L10 = add_rbt(0, L9), 
-    %{black,6,{black,4,{red,2,{black,1,{red,0,nil,nil},nil},{black,3,nil,nil}},{black,5,nil,nil}},{black,8,{black,7,nil,nil},{black,10,nil,nil}}} = L10,
+    L10 = add_rbt(0, L9), 
+    {black,6,{black,4,{red,2,{black,1,{red,0,nil,nil},nil},{black,3,nil,nil}},{black,5,nil,nil}},{black,8,{black,7,nil,nil},{black,10,nil,nil}}} = L10,
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 2.2
