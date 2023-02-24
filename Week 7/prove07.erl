@@ -48,13 +48,14 @@ getValue({Value, _Lambda}) -> Value.
 getLambda({_Value, Lambda}) -> Lambda.
 
 collect(Stream) -> collect(iter(Stream), []).
-collect(Stream, Result) -> 
-    Value = next(Stream),
-    case getLambda(Value) == done of
+collect(Stream, Acc) -> 
+    Next = next(Stream),
+    case getLambda(Next) == done of
         false ->
-            collect(Stream, Result ++ Value);
+            Result = Acc ++ [getValue(Next)],
+            collect(Next, Result);
         true ->
-            Result;
+            Acc
     end.
 
 
