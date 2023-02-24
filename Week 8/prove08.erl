@@ -13,10 +13,21 @@
 -export([test_ps1/0, test_ps2/0, test_ps3/0]).
 
 % Problem 1.1
-
+add(New_Value, {Node_Value, Left, Right}) when New_Value < Node_Value -> 
+    {Node_Value, add(New_Value, Left), Right};
+add(New_Value, {Node_Value, Left, Right}) when New_Value > Node_Value ->
+    {Node_Value, Left, add(New_Value, Right)};
+add(_New_Value, Node) -> Node.
 
 % Problem 1.2
-
+contains(Value, {Node_Value, _Left, _Right}) when Value == Node_Value ->
+    true;
+contains(Value, {Node_Value, Left, _Right}) when Value < Node_Value ->
+    contains(Value, Left);
+contains(Value, {Node_Value, _Left, Right}) when Value > Node_Value ->
+    contains(Value, Right);
+contains(Value, Node) -> 
+    false.
 
 % Problem 2.1
 % Finish the add_rbt by implementing add_rbt_ and the remaining scenarios
@@ -54,42 +65,42 @@ test_ps1() ->
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 1.1
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %L1 = add(5, nil),
-    %{5,nil,nil} = L1,
+    L1 = add(5, nil),
+    {5,nil,nil} = L1,
 
-    %L2 = add(3, L1),
-    %{5,{3,nil,nil},nil} = L2,
+    L2 = add(3, L1),
+    {5,{3,nil,nil},nil} = L2,
 
-    %L3 = add(7, L2),
-    %{5,{3,nil,nil},{7,nil,nil}} = L3,
+    L3 = add(7, L2),
+    {5,{3,nil,nil},{7,nil,nil}} = L3,
 
-    %L4 = add(4, L3),
-    %{5,{3,nil,{4,nil,nil}},{7,nil,nil}} = L4,
+    L4 = add(4, L3),
+    {5,{3,nil,{4,nil,nil}},{7,nil,nil}} = L4,
 
-    %L5 = add(2, L4),
-    %{5,{3,{2,nil,nil},{4,nil,nil}},{7,nil,nil}} = L5,
+    L5 = add(2, L4),
+    {5,{3,{2,nil,nil},{4,nil,nil}},{7,nil,nil}} = L5,
 
-    %L6 = add(6, L5),
-    %{5,{3,{2,nil,nil},{4,nil,nil}},{7,{6,nil,nil},nil}} = L6,
+    L6 = add(6, L5),
+    {5,{3,{2,nil,nil},{4,nil,nil}},{7,{6,nil,nil},nil}} = L6,
 
-    %L7 = add(8, L6),
-    %{5,{3,{2,nil,nil},{4,nil,nil}},{7,{6,nil,nil},{8,nil,nil}}} = L7,
+    L7 = add(8, L6),
+    {5,{3,{2,nil,nil},{4,nil,nil}},{7,{6,nil,nil},{8,nil,nil}}} = L7,
 
-    %L8 = add(5, L7), % Check a duplicate value
-    %{5,{3,{2,nil,nil},{4,nil,nil}},{7,{6,nil,nil},{8,nil,nil}}} = L8,
+    L8 = add(5, L7), % Check a duplicate value
+    {5,{3,{2,nil,nil},{4,nil,nil}},{7,{6,nil,nil},{8,nil,nil}}} = L8,
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 1.2
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %false = contains(1, L8),
-    %true = contains(2, L8),
-    %true = contains(3, L8),
-    %true = contains(4, L8),
-    %true = contains(5, L8),
-    %true = contains(6, L8),
-    %true = contains(7, L8),
-    %true = contains(8, L8),
-    %false = contains(9, L8),
+    false = contains(1, L8),
+    true  = contains(2, L8),
+    true  = contains(3, L8),
+    true  = contains(4, L8),
+    true  = contains(5, L8),
+    true  = contains(6, L8),
+    true  = contains(7, L8),
+    true  = contains(8, L8),
+    false = contains(9, L8),
 
     ok.
 
