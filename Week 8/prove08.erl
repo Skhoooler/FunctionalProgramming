@@ -27,7 +27,7 @@ contains(Value, {Node_Value, Left, _Right}) when Value < Node_Value ->
     contains(Value, Left);
 contains(Value, {Node_Value, _Left, Right}) when Value > Node_Value ->
     contains(Value, Right);
-contains(_Value, Node) -> 
+contains(_Value, _Node) -> 
     false.
 
 % Problem 2.1
@@ -37,14 +37,26 @@ add_rbt(New_Value, Tree) ->
     {_Color, Value, Left, Right} = add_rbt_(New_Value, Tree),
     {black, Value, Left, Right}.  % Change the root so its always black
 
-add_rbt_(New_Value, Node) -> implement_code_here.
+add_rbt_(New_Value, nil) -> 
+    {red, New_Value, nil, nil};
+add_rbt_(New_Value, {Color, Value, Left, Right}) when New_Value < Value ->
+    balance({Color, Value, add_rbt_(New_Value, Left), Right});
+add_rbt_(New_Value, {Color, Value, Left, Right}) when New_Value > Value ->
+    balance({Color, Value, Left, add_rbt_(New_Value, Right)});
+add_rbt_(_New_Value, Node) -> Node.
 
-balance({black,Z,{red,X,A,{red,Y,B,C}},D}) -> {red,Y,{black,X,A,B},{black,Z,C,D}};
-
+balance({black,Z,{red,X,A,{red,Y,B,C}},D}) -> 
+    {red,Y,{black,X,A,B},{black,Z,C,D}};
+balance({black, X, A, {red, Y, B, {red, Z, C, D}}}) -> 
+    {red, Y, {black, X, A, B}, {black, Z, C, D}};
+balance({black, X, A, {red, Z, {red, Y, B, C}, D}}) ->
+    {red, Y, {black, X, A, B}, {black, Z, C, D}};
+balance({black, Z, {red, Y, {red, X, A, B}, C}, D}) ->
+    {red, Y, {black, X, A, B}, {black, Z, C, D}};
 balance(Node) -> Node.
 
 % Problem 2.2
-
+contains_rbt(Value, {_Color, Node_Value, Left, Right}) -> contains(Value, {Node_Value, Left, Right}).
 
 % The following functions are fully implemented for use by the Problem 3.1 test
 % code.
@@ -144,15 +156,15 @@ test_ps2() ->
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 2.2
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %false = contains_rbt(-1, L10),
-    %true = contains_rbt(2, L10),
-    %true = contains_rbt(3, L10),
-    %true = contains_rbt(4, L10),
-    %true = contains_rbt(5, L10),
-    %true = contains_rbt(6, L10),
-    %true = contains_rbt(7, L10),
-    %true = contains_rbt(8, L10),
-    %false = contains_rbt(9, L10),
+    false = contains_rbt(-1, L10),
+    true = contains_rbt(2, L10),
+    true = contains_rbt(3, L10),
+    true = contains_rbt(4, L10),
+    true = contains_rbt(5, L10),
+    true = contains_rbt(6, L10),
+    true = contains_rbt(7, L10),
+    true = contains_rbt(8, L10),
+    false = contains_rbt(9, L10),
 
     ok.
 
