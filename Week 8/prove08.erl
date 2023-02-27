@@ -56,7 +56,14 @@ balance({black, Z, {red, Y, {red, X, A, B}, C}, D}) ->
 balance(Node) -> Node.
 
 % Problem 2.2
-contains_rbt(Value, {_Color, Node_Value, Left, Right}) -> contains(Value, {Node_Value, Left, Right}).
+contains_rbt(Value, {_Color, Node_Value, _Left, _Right}) when Value == Node_Value ->
+    true;
+contains_rbt(Value, {_Color, Node_Value, _Left, Right}) when Value > Node_Value ->
+    contains_rbt(Value, Right);
+contains_rbt(Value, {_Color, Node_Value, Left, _Right}) when Value < Node_Value ->
+    contains_rbt(Value, Left);
+contains_rbt(_Value, _Node) ->
+    false.
 
 % The following functions are fully implemented for use by the Problem 3.1 test
 % code.
@@ -179,23 +186,26 @@ test_ps3() ->
     % variable below when performing the foldl functions.  Add your code
 	% in between the start_perf and stop_perf function calls.
     
-    %List = lists:seq(1,10000),
-    %start_perf(),
-    
-    %stop_perf("add"),
+    List = lists:seq(1,10000),
 
-    %start_perf(),
-    
-    %stop_perf("add_rbt"),
+    % ADD 
+    start_perf(),
+    lists:foldl(fun add/2, nil, List),
+    stop_perf("add"),
 
-    %start_perf(),
-    
-    %stop_perf("contains"),
+    % ADD_RBT
+    start_perf(),
+    lists:foldl(fun add_rbt/2, nil, List),
+    stop_perf("add_rbt"),
 
-    %start_perf(),
-    
-    %stop_perf("contains_rbt"),
+    % CONTAINS
+    start_perf(),
+    lists:foldl(fun contains/2, nil, List),
+    stop_perf("contains"),
 
-    % Observations (see instructions):  
+    % CONTAINS_RBT
+    start_perf(),
+    lists:foldl(fun contains_rbt/2, nil, List),
+    stop_perf("contains_rbt"),
 
     ok.
