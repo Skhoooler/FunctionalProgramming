@@ -18,11 +18,18 @@
 rank(nil) -> 0;
 rank({Rank, _, _, _}) -> Rank.
 
+insert(New_Value, nil) -> make(New_Value, nil, nil);
+insert(New_Value, Node={Rank, Value, Left, Right}) when New_Value =< Value ->
+    make(New_Value, nil, Node);
+insert(New_Value, Node={Rank, Value, Left, Right}) ->
+    make(Value, Left, insert(New_Value, Right)).
 
 
 % Problem 2.1
 % Modify the make function below to perform the swap per the instructions.
 make(Value, Left, Right) -> 
+    Rank_Left = rank(Left),
+    Rank_Right = rank(Right),
     {rank(Right) + 1, Value, Left, Right}.  
 
 % Problem 2.2
@@ -48,8 +55,8 @@ test_ps1() ->
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Note that this test code when first executed will not perform the swaps
     % When Problem 2.1 is implemented, this code will behave differently.
-    %H = lists:foldl(fun insert/2, nil, [10,15,20,5,12,17,19,20,21,13,8,1]),
-    %io:format("~p~n",[H]),
+    H = lists:foldl(fun insert/2, nil, [10,15,20,5,12,17,19,20,21,13,8,1]),
+    io:format("~p~n",[H]),
 
     % The result without swapping should be:
     % {12,1,nil,
@@ -69,8 +76,8 @@ test_ps2() ->
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 2.1
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %H = lists:foldl(fun insert/2, nil, [10,15,20,5,12,17,19,20,21,13,8,1]),
-    %{1,1,{2,5,{2,10,{1,15,nil,nil},{1,20,nil,nil}},{1,8,{2,12,{2,19,{1,20,nil,nil},{1,21,nil,nil}},{1,13,{1,17,nil,nil},nil}},nil}},nil} = H,   
+    H = lists:foldl(fun insert/2, nil, [10,15,20,5,12,17,19,20,21,13,8,1]),
+    {1,1,{2,5,{2,10,{1,15,nil,nil},{1,20,nil,nil}},{1,8,{2,12,{2,19,{1,20,nil,nil},{1,21,nil,nil}},{1,13,{1,17,nil,nil},nil}},nil}},nil} = H,   
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 2.2
