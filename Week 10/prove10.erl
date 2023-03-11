@@ -13,19 +13,24 @@
 -export([test_ps1/0, test_ps2/0, test_ps3/0]).
 
 % Problem 1.1
-prepend(Value, List) -> merge({leaf, Value}, List).
+prepend(Value, RAL) -> merge({leaf, Value}, RAL).
 
-merge(Tree, _) -> [Tree];
-merge(Carry_Tree, [nil, Rest_Trees]) -> [Carry_Tree | Rest_Trees];
-merge(Carry_Tree, [Tree, Rest_Trees]) ->
-    MergedTree = {node, count(Carry_Tree), Carry_Tree, Tree},
-    [nil | merge(MergedTree, Rest_Trees)].
+merge(Carry_Tree, []) -> [Carry_Tree];
+merge(Carry_Tree, [nil | Rest_Trees]) -> [Carry_Tree | Rest_Trees];
+merge(Carry_Tree, [Tree | Rest_Trees]) ->
+    Merged_Tree = {node, count(Tree) + count(Carry_Tree), Carry_Tree, Tree},
+    [nil | merge(Merged_Tree, Rest_Trees)].
 
 count({leaf, _Value}) -> 1;
 count({node, Count, _Left, _Right}) -> Count.
+
 % Problem 2.1
-
-
+lookup(Index, _RAL) when Index < 0 -> nil;
+lookup(_Index, []) -> nil;
+lookup(Index, [nil  | Rest_Trees]) -> lookup(Index, Rest_Trees);
+lookup(Index, [Tree | Rest_Trees]) when Index >= count(Tree) ->
+    lookup(Index - count(Tree), Rest_Trees);
+lookup(Index, [Tree | Rest_Tree]) -> lookup_in_tree(Index, Tree).
 % Problem 2.2
 
 
@@ -102,22 +107,22 @@ test_ps2() ->
     % Test Problem 2.1
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    %RAL1 = prepend(100, []),
-    %RAL2 = prepend(200, RAL1),
-    %RAL3 = prepend(300, RAL2),
-    %RAL4 = prepend(400, RAL3),
-    %RAL5 = prepend(500, RAL4),
-    %RAL6 = prepend(600, RAL5),
-    %RAL7 = prepend(700, RAL6),
-    %nil = lookup(7,RAL7),  % Invalid Index
-    %nil = lookup(-1,RAL7), % Invalid Index
-    %700 = lookup(0,RAL7),
-    %600 = lookup(1,RAL7),
-    %500 = lookup(2,RAL7),
-    %400 = lookup(3,RAL7),
-    %300 = lookup(4,RAL7),
-    %200 = lookup(5,RAL7),
-    %100 = lookup(6,RAL7),
+    RAL1 = prepend(100, []),
+    RAL2 = prepend(200, RAL1),
+    RAL3 = prepend(300, RAL2),
+    RAL4 = prepend(400, RAL3),
+    RAL5 = prepend(500, RAL4),
+    RAL6 = prepend(600, RAL5),
+    RAL7 = prepend(700, RAL6),
+    nil = lookup(7,RAL7),  % Invalid Index
+    nil = lookup(-1,RAL7), % Invalid Index
+    700 = lookup(0,RAL7),
+    600 = lookup(1,RAL7),
+    500 = lookup(2,RAL7),
+    400 = lookup(3,RAL7),
+    300 = lookup(4,RAL7),
+    200 = lookup(5,RAL7),
+    100 = lookup(6,RAL7),
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 2.2
