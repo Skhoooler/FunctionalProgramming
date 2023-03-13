@@ -28,9 +28,23 @@ count({node, Count, _Left, _Right}) -> Count.
 lookup(Index, _RAL) when Index < 0 -> nil;
 lookup(_Index, []) -> nil;
 lookup(Index, [nil  | Rest_Trees]) -> lookup(Index, Rest_Trees);
-lookup(Index, [Tree | Rest_Trees]) when Index >= count(Tree) ->
-    lookup(Index - count(Tree), Rest_Trees);
-lookup(Index, [Tree | Rest_Tree]) -> lookup_in_tree(Index, Tree).
+lookup(Index, [Tree | Rest_Trees]) -> 
+    case Index >= count(Tree) of
+        true -> lookup(Index - count(Tree), Rest_Trees);
+        false -> lookup_in_tree(Index, Tree)
+    end.
+
+
+lookup_in_tree(Index, {node, Count, Left, Right}) ->
+    
+    case Count div 2 == 1 of
+        false -> lookup_in_tree(Index, Right);
+        true -> lookup_in_tree(Index, Left)
+    end;
+lookup_in_tree(Index, {leaf, Value}) -> 
+    Value.
+
+
 % Problem 2.2
 
 
@@ -114,8 +128,7 @@ test_ps2() ->
     RAL5 = prepend(500, RAL4),
     RAL6 = prepend(600, RAL5),
     RAL7 = prepend(700, RAL6),
-    nil = lookup(7,RAL7),  % Invalid Index
-    nil = lookup(-1,RAL7), % Invalid Index
+    io:format("~p~n", [RAL7]),
     700 = lookup(0,RAL7),
     600 = lookup(1,RAL7),
     500 = lookup(2,RAL7),
@@ -123,6 +136,8 @@ test_ps2() ->
     300 = lookup(4,RAL7),
     200 = lookup(5,RAL7),
     100 = lookup(6,RAL7),
+    nil = lookup(7,RAL7),  % Invalid Index
+    nil = lookup(-1,RAL7), % Invalid Index
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 2.2
