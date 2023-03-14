@@ -35,9 +35,9 @@ lookup(Index, [Tree | Rest_Trees]) ->
     end.
 
 
-lookup_in_tree(Index, {node, Count, Left, Right}) ->
-    
-    case Count div 2 == 1 of
+lookup_in_tree(Index, {node, Bitspace, Left, Right}) ->
+    io:format("~p ~p~n", [Index, Bitspace]),
+    case Index + 1 =< Bitspace / 2 of
         false -> lookup_in_tree(Index, Right);
         true -> lookup_in_tree(Index, Left)
     end;
