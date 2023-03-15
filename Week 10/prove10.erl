@@ -35,13 +35,14 @@ lookup(Index, [Tree | Rest_Trees]) ->
     end.
 
 
-lookup_in_tree(Index, {node, Bitspace, Left, Right}) ->
-    io:format("~p ~p~n", [Index, Bitspace]),
-    case Index + 1 =< Bitspace / 2 of
-        false -> lookup_in_tree(Index, Right);
+lookup_in_tree(Index, {node, Count, Left, Right} = _Tree) ->
+    Bitspace = (Count div 2) - 1,
+    io:format("Index: ~p~nCount: ~p~nBitspace: ~p~n~n", [Index, Count, Bitspace]),
+    case Index =< Bitspace of
+        false -> lookup_in_tree(Index - Bitspace, Right);
         true -> lookup_in_tree(Index, Left)
     end;
-lookup_in_tree(Index, {leaf, Value}) -> 
+lookup_in_tree(_Index, {leaf, Value}) -> 
     Value.
 
 
