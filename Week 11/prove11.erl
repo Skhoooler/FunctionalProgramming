@@ -14,20 +14,27 @@
 -export([test_ps1/0, test_ps2/0, test_ps3/0]).
 
 % Problem 1.1
-add(Word, nil) -> add(Word, dict:new());
+add(Word, nil) -> add(Word, #{});
 add([], Node)  -> 
-    case dict:find(done, Node) of
+    case maps:is_key(done, Node) of
         true  -> Node;
-        false -> dict:store(done, nil, Node)
+        false -> maps:put(done, nil, Node)
     end;
 add([First | Rest], Node) ->
-    case dict:find(First, Node) of
-        true  -> dict:store(First, add(Rest, dict:find(First, Node)), Node);
-        false -> dict:store(First, add(Rest, dict:new()), Node)
+    case maps:is_key(First, Node) of
+        true  -> maps:put(First, add(Rest, maps:get(First, Node)), Node);
+        false -> maps:put(First, add(Rest, #{}), Node)
     end.
 
 
 % Problem 2.1
+search(_Word, nil) -> false;
+search([], Node) -> maps:is_key(done, Node);
+search([First | Rest], Node) -> 
+    case maps:is_key(First, Node) of  
+        true -> search(Rest, maps:get(First, Node));
+        false -> false
+    end.
 
 
 % Problem 2.2
@@ -100,19 +107,19 @@ test_ps2() ->
     % Test Problem 2.1
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    % Trie = lists:foldl(fun add/2, nil, ["day","date","days","","cow","cold","dog"]),
-    % true = search("day",Trie),
-    % true = search("date",Trie),
-    % true = search("days",Trie),
-    % false = search("da",Trie),
-    % false = search("dates",Trie),
-    % true = search("",Trie),
-    % true = search("cow",Trie),
-    % true = search("cold",Trie),
-    % true = search("dog",Trie),
-    % false = search("colt",Trie),
-    % false = search("pig",Trie),
-    % false = search("bob",nil), % Test with an empty Trie
+    Trie = lists:foldl(fun add/2, nil, ["day","date","days","","cow","cold","dog"]),
+    true = search("day",Trie),
+    true = search("date",Trie),
+    true = search("days",Trie),
+    false = search("da",Trie),
+    false = search("dates",Trie),
+    true = search("",Trie),
+    true = search("cow",Trie),
+    true = search("cold",Trie),
+    true = search("dog",Trie),
+    false = search("colt",Trie),
+    false = search("pig",Trie),
+    false = search("bob",nil), % Test with an empty Trie
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 2.2
