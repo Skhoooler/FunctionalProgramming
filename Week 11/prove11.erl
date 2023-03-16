@@ -10,9 +10,21 @@
 % When writing tests use the `expected_result` = `actual result` format.
 
 -module(prove11).
+-import(dict, []).
 -export([test_ps1/0, test_ps2/0, test_ps3/0]).
 
 % Problem 1.1
+add(Word, nil) -> add(Word, dict:new());
+add([], Node)  -> 
+    case dict:find(done, Node) of
+        true  -> Node;
+        false -> dict:store(done, nil, Node)
+    end;
+add([First | Rest], Node) ->
+    case dict:find(First, Node) of
+        true  -> dict:store(First, add(Rest, dict:find(First, Node)), Node);
+        false -> dict:store(First, add(Rest, dict:new()), Node)
+    end.
 
 
 % Problem 2.1
@@ -58,26 +70,26 @@ test_ps1() ->
 
     % ASCII Table Lookup: https://www.asciitable.com/
 
-    % T1 = add("day",nil),
-    % #{100 := #{97 := #{121 := #{done := nil}}}} = T1,
+    T1 = add("day",nil),
+    #{100 := #{97 := #{121 := #{done := nil}}}} = T1,
 
-    % T2 = add("date",T1),
-    % #{100 := #{97 := #{116 := #{101 := #{done := nil}},121 := #{done := nil}}}} = T2,
+    T2 = add("date",T1),
+    #{100 := #{97 := #{116 := #{101 := #{done := nil}},121 := #{done := nil}}}} = T2,
 
-    % T3 = add("days",T2),
-    % #{100 := #{97 := #{116 := #{101 := #{done := nil}}, 121 := #{115 := #{done := nil},done := nil}}}} = T3,
+    T3 = add("days",T2),
+    #{100 := #{97 := #{116 := #{101 := #{done := nil}}, 121 := #{115 := #{done := nil},done := nil}}}} = T3,
 
-    % T4 = add("",T3),
-    % #{100 := #{97 := #{116 := #{101 := #{done := nil}}, 121 := #{115 := #{done := nil},done := nil}}}, done := nil} = T4,
+    T4 = add("",T3),
+    #{100 := #{97 := #{116 := #{101 := #{done := nil}}, 121 := #{115 := #{done := nil},done := nil}}}, done := nil} = T4,
 
-    % T5 = add("cow",T4),
-    % #{99 := #{111 := #{119 := #{done := nil}}}, 100 := #{97 := #{116 := #{101 := #{done := nil}}, 121 := #{115 := #{done := nil},done := nil}}}, done := nil} = T5,
+    T5 = add("cow",T4),
+    #{99 := #{111 := #{119 := #{done := nil}}}, 100 := #{97 := #{116 := #{101 := #{done := nil}}, 121 := #{115 := #{done := nil},done := nil}}}, done := nil} = T5,
 
-    % T6 = add("cold",T5),
-    % #{99 := #{111 := #{108 := #{100 := #{done := nil}},119 := #{done := nil}}}, 100 := #{97 := #{116 := #{101 := #{done := nil}}, 121 := #{115 := #{done := nil},done := nil}}}, done := nil} = T6,
+    T6 = add("cold",T5),
+    #{99 := #{111 := #{108 := #{100 := #{done := nil}},119 := #{done := nil}}}, 100 := #{97 := #{116 := #{101 := #{done := nil}}, 121 := #{115 := #{done := nil},done := nil}}}, done := nil} = T6,
 
-    % T7 = add("dog",T6),
-    % #{99 := #{111 := #{108 := #{100 := #{done := nil}},119 := #{done := nil}}}, 100 := #{97 := #{116 := #{101 := #{done := nil}}, 121 := #{115 := #{done := nil},done := nil}}, 111 := #{103 := #{done := nil}}}, done := nil} = T7,
+    T7 = add("dog",T6),
+    #{99 := #{111 := #{108 := #{100 := #{done := nil}},119 := #{done := nil}}}, 100 := #{97 := #{116 := #{101 := #{done := nil}}, 121 := #{115 := #{done := nil},done := nil}}, 111 := #{103 := #{done := nil}}}, done := nil} = T7,
 
     ok.
 
