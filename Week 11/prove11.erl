@@ -10,7 +10,6 @@
 % When writing tests use the `expected_result` = `actual result` format.
 
 -module(prove11).
--import(dict, []).
 -export([test_ps1/0, test_ps2/0, test_ps3/0]).
 
 % Problem 1.1
@@ -39,12 +38,20 @@ search([First | Rest], Node) ->
 
 % Problem 2.2
 % Complete the count function per the instructions.
-
 count(nil) -> 0;
 count(Node = #{done := nil}) -> 
-    put_your_code_here;
+    Remaining_Nodes = maps:filter( fun(K, _V) -> K =/= done end, Node ),
+    
+    case maps:size(Remaining_Nodes) of
+        0 -> 1;
+        _ -> 1 + count(Remaining_Nodes)
+    end;
+    
 count(Node) ->
-    put_your_code_here.
+    Fun = fun(_Key, Value, Acc) -> 
+        Acc + count(Value)
+    end,
+    maps:fold(Fun, 0, Node).
 
 % Code for use in Problem 3.1
 
@@ -125,8 +132,8 @@ test_ps2() ->
     % Test Problem 2.2
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    % 7 = count(Trie),
-    % 0 = count(nil),
+    7 = count(Trie),
+    0 = count(nil),
     
     ok.
 
@@ -140,12 +147,22 @@ test_ps3() ->
     % Write Test Code to compare the memory size of the phone numbers stored in a list
     % versus stored in a Trie.  
 
-    % PhoneList = read_file("phone.txt"),
-    % PhoneTrie = put_your_code_here,
-    % SizeList = put_your_code_here,
-    % SizeTrie = put_your_code_here,
-    % io:format("Size List = ~p  Size Trie = ~p~n",[SizeList, SizeTrie]),
+    PhoneList = read_file("phone.txt"),
+    PhoneTrie = lists:foldl(fun(Phone, Trie) -> add(Phone, Trie) end, #{}, PhoneList),
+    SizeList = erts_debug:flat_size(PhoneList),
+    SizeTrie = erts_debug:flat_size(PhoneTrie),
+    io:format("Size List = ~p  Size Trie = ~p~n",[SizeList, SizeTrie]),
 
     % Observations (see instructions): 
+    % The trie was 27% of the size of the list.
 
+    % The reason for the reduction is that the phone numbers all share the first 7 characters, so the first 7
+    % characters of each phone number are only represented once in the trie, as opposed to 80,000 times in the list.
+    % In addition to that, the next 3 numbers (plus the dash) in the phone number only has 8 variations, so those are only represented
+    % 8 times in the trie.
+
+    % Finally, the only unique characters are the last 4 in the trie. So the total size of the trie is 
+    %   (7 + 8 + (4 * 80,000)) * Char encoding size  
+    %       instead of
+    %   ((7 + 8 + 4) * 80,000) * Char encoding size
     ok.
