@@ -19,10 +19,14 @@
 % for the head function so that the check functions
 % below will work.
 enqueue(Value, {[] = _Front, [] = Back}) -> {[Value], Back};
+enqueue(Value, {[], [One]}) -> {[One], [Value]};
 enqueue(Value, {Front, Rear}) ->{Front, [Value] ++ Rear}.
 
 dequeue({[], []}) -> {[], []};
-dequeue({[_One], Back}) -> {lists:reverse(Back) , []};
+dequeue({[], [_One]}) -> {[], []};
+dequeue({[_One], Back}) -> 
+    {List1, List2} = lists:split(length(Back) div 2, Back),
+    {lists:reverse(List2) , List1};
 dequeue({[_First | Rest], Back}) -> {Rest, Back}.
 
 % For problem 2.1, you will need to update the dequeue 
@@ -35,6 +39,7 @@ empty({[], []}) -> true;
 empty(_) -> false.
 
 head({[], []}) -> nil;
+head({[], [One]}) -> One;
 head({[First | _Rest], _Back}) -> First.
 
 
@@ -46,7 +51,23 @@ head({[First | _Rest], _Back}) -> First.
 % the dequeue and head functions you previously 
 % implemented to support the deque.
 
-tail(Parameters) -> todo.
+enqueue_front(Value, {[], []}) -> {[], [Value]};
+enqueue_front(Value, {[One], []}) -> {[Value], [One]};
+enqueue_front(Value, {Front, Back}) -> {[Value | Front], Back}.
+
+dequeue_back({[], []}) -> {[], []};
+dequeue_back({[One], []}) -> {[], []};
+dequeue_back({Front, [One]}) ->
+    {List1, List2} = lists:split(length(Front) div 2, Front),
+    {List1, (lists:reverse(List2))};
+dequeue_back({Front, [First | Rest]}) -> {Front, Rest}.
+
+tail({[], []}) -> nil;
+tail({[One], []}) -> One;
+tail({[First | Rest], []}) -> 
+    Reversed = lists:reverse(Rest),
+    tail({[], Reversed});
+tail({_Front, [First | _Rest]}) -> First.
 
 
 % Code for use in Problem 3.1
@@ -147,55 +168,55 @@ test_ps2() ->
     Q6 = enqueue(6, Q5),
     check_deque(Q6,1,6,false),
 
-    % Q7 = dequeue(Q6),
-    % check_deque(Q7,2,6,false),
-    % Q8 = dequeue(Q7),
-    % check_deque(Q8,3,6,false),
-    % Q9 = dequeue(Q8),
-    % check_deque(Q9,4,6,false),
+    Q7 = dequeue(Q6),
+    check_deque(Q7,2,6,false),
+    Q8 = dequeue(Q7),
+    check_deque(Q8,3,6,false),
+    Q9 = dequeue(Q8),
+    check_deque(Q9,4,6,false),
 
-    % Q10 = enqueue(7,Q9),
-    % check_deque(Q10,4,7,false),
-    % Q11 = enqueue(8,Q10),
-    % check_deque(Q11,4,8,false),
-    % Q12 = enqueue(9,Q11),
-    % check_deque(Q12,4,9,false),
+    Q10 = enqueue(7,Q9),
+    check_deque(Q10,4,7,false),
+    Q11 = enqueue(8,Q10),
+    check_deque(Q11,4,8,false),
+    Q12 = enqueue(9,Q11),
+    check_deque(Q12,4,9,false),
 
-    % Q13 = enqueue_front(10,Q12),
-    % check_deque(Q13,10,9,false),
-    % Q14 = enqueue_front(11,Q13),
-    % check_deque(Q14,11,9,false),
-    % Q15 = enqueue_front(12,Q14),
-    % check_deque(Q15,12,9,false),
+    Q13 = enqueue_front(10,Q12),
+    check_deque(Q13,10,9,false),
+    Q14 = enqueue_front(11,Q13),
+    check_deque(Q14,11,9,false),
+    Q15 = enqueue_front(12,Q14),
+    check_deque(Q15,12,9,false),
 
-    % Q16 = dequeue_back(Q15),
-    % check_deque(Q16,12,8,false),
-    % Q17 = dequeue_back(Q16),
-    % check_deque(Q17,12,7,false),
-    % Q18 = dequeue_back(Q17),
-    % check_deque(Q18,12,6,false),
-    % Q19 = dequeue_back(Q18),
-    % check_deque(Q19,12,5,false),
-    % Q20 = dequeue_back(Q19),
-    % check_deque(Q20,12,4,false),
+    Q16 = dequeue_back(Q15),
+    check_deque(Q16,12,8,false),
+    Q17 = dequeue_back(Q16),
+    check_deque(Q17,12,7,false),
+    Q18 = dequeue_back(Q17),
+    check_deque(Q18,12,6,false),
+    Q19 = dequeue_back(Q18),
+    check_deque(Q19,12,5,false),
+    Q20 = dequeue_back(Q19),
+    check_deque(Q20,12,4,false),
 
-    % Q21 = dequeue(Q20),
-    % check_deque(Q21,11,4,false),
-    % Q22 = dequeue(Q21),
-    % check_deque(Q22,10,4,false),
-    % Q23 = dequeue(Q22),
-    % check_deque(Q23,4,4,false),
-    % Q24 = dequeue(Q23),
-    % check_deque(Q24,nil,nil,true),
+    Q21 = dequeue(Q20),
+    check_deque(Q21,11,4,false),
+    Q22 = dequeue(Q21),
+    check_deque(Q22,10,4,false),
+    Q23 = dequeue(Q22),
+    check_deque(Q23,4,4,false),
+    Q24 = dequeue(Q23),
+    check_deque(Q24,nil,nil,true),
 
-    % Q25 = enqueue_front(100,Q24),
-    % check_deque(Q25,100,100,false),
-    % Q26 = enqueue(200,Q25),
-    % check_deque(Q26,100,200,false),
-    % Q27 = dequeue_back(Q26),
-    % check_deque(Q27,100,100,false),
-    % Q28 = dequeue(Q27),
-    % check_deque(Q28,nil,nil,true),
+    Q25 = enqueue_front(100,Q24),
+    check_deque(Q25,100,100,false),
+    Q26 = enqueue(200,Q25),
+    check_deque(Q26,100,200,false),
+    Q27 = dequeue_back(Q26),
+    check_deque(Q27,100,100,false),
+    Q28 = dequeue(Q27),
+    check_deque(Q28,nil,nil,true),
   
     ok.
 
@@ -210,15 +231,15 @@ test_ps3() ->
     % enqueue and dequeue on 1 million values
     % per the instructions. 
 
-    % List = lists:seq(1,1000000),
+    List = lists:seq(1,1000000),
 
-    % start_perf(),
+    start_perf(),
     
-    % stop_perf("enqueue"),
+    stop_perf("enqueue"),
 
-    % start_perf(),
+    start_perf(),
     
-    % stop_perf("dequeue"),
+    stop_perf("dequeue"),
 	
 	% Observations (see instructions): 
 
