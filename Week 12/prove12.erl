@@ -56,15 +56,15 @@ enqueue_front(Value, {[One], []}) -> {[Value], [One]};
 enqueue_front(Value, {Front, Back}) -> {[Value | Front], Back}.
 
 dequeue_back({[], []}) -> {[], []};
-dequeue_back({[One], []}) -> {[], []};
-dequeue_back({Front, [One]}) ->
+dequeue_back({[_One], []}) -> {[], []};
+dequeue_back({Front, [_One]}) ->
     {List1, List2} = lists:split(length(Front) div 2, Front),
     {List1, (lists:reverse(List2))};
-dequeue_back({Front, [First | Rest]}) -> {Front, Rest}.
+dequeue_back({Front, [_First | Rest]}) -> {Front, Rest}.
 
 tail({[], []}) -> nil;
 tail({[One], []}) -> One;
-tail({[First | Rest], []}) -> 
+tail({[_First | Rest], []}) -> 
     Reversed = lists:reverse(Rest),
     tail({[], Reversed});
 tail({_Front, [First | _Rest]}) -> First.
@@ -232,16 +232,23 @@ test_ps3() ->
     % per the instructions. 
 
     List = lists:seq(1,1000000),
+    Queue = create(),
 
     start_perf(),
     
+    lists:foreach(fun(Item) -> enqueue(Item, Queue) end, List),
+
     stop_perf("enqueue"),
 
     start_perf(),
     
+    lists:foreach(fun(_) -> dequeue(Queue) end, List),
+
     stop_perf("dequeue"),
 	
 	% Observations (see instructions): 
+    % The time for enqueue is 309,349
+    % The time for dequeue is 281,702
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 3.2
@@ -251,14 +258,19 @@ test_ps3() ->
     % enqueue_front and dequeue_back on 1 million values
     % per the instructions. 
 
+    Queue2 = create(),
 
-    % start_perf(),
-    
-    % stop_perf("enqueue_front"),
+    start_perf(),
 
-    % start_perf(),
+    lists:foreach(fun(Item) -> enqueue_front(Item, Queue2) end, List),
+
+    stop_perf("enqueue_front"),
+
+    start_perf(),
     
-    % stop_perf("dequeue_front"),
+    lists:foreach(fun(_) -> dequeue_back(Queue2) end, List),
+
+    stop_perf("dequeue_front"),
 
 
     % Observations (see instructions): 
