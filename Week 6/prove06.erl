@@ -60,7 +60,14 @@ check_length(Password) ->
         true -> {ok}
     end.
 
+result_unit() -> {ok}.
 
+result_bind({ok}, Value, Lambda) -> Lambda(Value);
+result_bind({error, Messages}, Value, Lambda) -> 
+    case Lambda(Value) of
+        {ok} -> {error, Messages};
+        {error, Message} -> {error, Messages ++ Message}
+    end.
 
 % Problem 3.1
 % Most of the list monad code is provided below.  Implement the pop and bind functions.
@@ -72,7 +79,12 @@ len({_List, Length}) -> Length.
 
 value({List, _Length}) -> List.
 
+pop(nil) -> create();
+pop({_First, Rest}) -> {Rest, -1}.
 
+bind({List, Length}, Fun, Optional_Parameters) -> 
+    {New_List, Delta_Length} = apply(Fun, [Optional_Parameters, List]),
+    {New_List, Length + Delta_Length}.
 
 % Problem 3.2
 % The push2 function is implemented below.  Implement the pop2 and bind2 per the instructions.
@@ -139,20 +151,6 @@ test_ps1() ->
 
     ok.
 
-result_unit() -> {ok}.
-%result_unit(Message) -> {error, [Message]}.
-
-result_bind({ok}, Password, Lambda) -> 
-    case Lambda(Password) of
-        {ok} -> result_unit();
-        {error, [ErrorMessage]} -> {error, [ErrorMessage]}
-    end;
-
-result_bind({error, [PreviousError | RemainingErrors]}, Password, Lambda) -> 
-    case Lambda(Password) of 
-        {ok} -> [PreviousError] ++ [RemainingErrors];
-        {error, [NewError]} -> {error, [PreviousError] ++ [RemainingErrors] ++ [NewError]}
-    end.
 
 % Test code for problem set 2
 test_ps2() ->
@@ -186,13 +184,19 @@ test_ps2() ->
     %%%%%%%%%%%%%%%%%%%%%%%%%%%    
 
     % Modify the test code below to replace `put_your_fold_here` with a foldl to do the same chaining as the previous problem
-    Result1_With_Fold = put_your_fold_here,
+    Result1_With_Fold = lists:foldl(
+        fun(Fun, Acc) -> result_bind(Acc, Password1, Fun) end, 
+        result_unit(), [fun check_mixed_case/1, fun check_number_exists/1, fun check_length/1]),
     io:format("Result1_With_Fold = ~p~n",[Result1_With_Fold]),
 
-    Result2_With_Fold = put_your_fold_here,
+    Result2_With_Fold = lists:foldl(
+        fun(Fun, Acc) -> result_bind(Acc, Password1, Fun) end, 
+        result_unit(), [fun check_mixed_case/1, fun check_number_exists/1, fun check_length/1]),
     io:format("Result2_With_Fold = ~p~n",[Result2_With_Fold]),
 
-    Result3_With_Fold = put_your_fold_here,
+    Result3_With_Fold = lists:foldl(
+        fun(Fun, Acc) -> result_bind(Acc, Password1, Fun) end, 
+        result_unit(), [fun check_mixed_case/1, fun check_number_exists/1, fun check_length/1]),
     io:format("Result3_With_Fold = ~p~n",[Result3_With_Fold]),
 
     ok.
@@ -204,41 +208,41 @@ test_ps3() ->
     % Test Problem 3.1
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    %L1 = create(),
-    %nil = value(L1),
-    %0 = len(L1),
+    L1 = create(),
+    nil = value(L1),
+    0 = len(L1),
 
-    %L2 = bind(L1, fun push/2, [2]),
-    %{2,nil} = value(L2),
-    %1 = len(L2),
+    L2 = bind(L1, fun push/2, [2]),
+    {2,nil} = value(L2),
+    1 = len(L2),
 
-    %L3 = bind(L2, fun push/2, [4]),
-    %{4,{2,nil}} = value(L3),
-    %2 = len(L3),
+    L3 = bind(L2, fun push/2, [4]),
+    {4,{2,nil}} = value(L3),
+    2 = len(L3),
 
-    %L4 = bind(L3, fun push/2, [6]),
-    %{6,{4,{2,nil}}} = value(L4),
-    %3 = len(L4),
+    L4 = bind(L3, fun push/2, [6]),
+    {6,{4,{2,nil}}} = value(L4),
+    3 = len(L4),
     
-    %L5 = bind(L4, fun pop/1, []),
-    %{4,{2,nil}} = value(L5),
-    %2 = len(L5),
+    L5 = bind(L4, fun pop/1, []),
+    {4,{2,nil}} = value(L5),
+    2 = len(L5),
     
-    %L6 = bind(L5, fun push/2, [8]),
-    %{8,{4,{2,nil}}} = value(L6),
-    %3 = len(L6),
+    L6 = bind(L5, fun push/2, [8]),
+    {8,{4,{2,nil}}} = value(L6),
+    3 = len(L6),
 
-    %L7 = bind(L6, fun pop/1, []),
-    %{4,{2,nil}} = value(L7),
-    %2 = len(L7),
+    L7 = bind(L6, fun pop/1, []),
+    {4,{2,nil}} = value(L7),
+    2 = len(L7),
 
-    %L8 = bind(L7, fun pop/1, []),
-    %{2,nil} = value(L8),
-    %1 = len(L8),
+    L8 = bind(L7, fun pop/1, []),
+    {2,nil} = value(L8),
+    1 = len(L8),
 
-    %L9 = bind(L8, fun pop/1, []),
-    %nil = value(L9),
-    %0 = len(L9),
+    L9 = bind(L8, fun pop/1, []),
+    nil = value(L9),
+    0 = len(L9),
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 3.2
