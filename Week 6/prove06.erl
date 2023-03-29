@@ -80,11 +80,11 @@ len({_List, Length}) -> Length.
 value({List, _Length}) -> List.
 
 pop(nil) -> create();
-pop({_First, Rest}) -> {Rest, -1}.
+pop([_First | Rest]) -> {Rest, -1}.
 
 bind({List, Length}, Fun, Optional_Parameters) -> 
-    {New_List, Delta_Length} = apply(Fun, [Optional_Parameters, List]),
-    {New_List, Length + Delta_Length}.
+    {{Value, New_List}, Delta_Length} = apply(Fun, [Optional_Parameters, List]),
+    {{Value, List}, Length + Delta_Length}.
 
 % Problem 3.2
 % The push2 function is implemented below.  Implement the pop2 and bind2 per the instructions.
