@@ -27,26 +27,40 @@ count({node, Count, _Left, _Right}) -> Count.
 % Problem 2.1
 lookup(Index, _RAL) when Index < 0 -> nil;
 lookup(_Index, []) -> nil;
-lookup(Index, [nil  | Rest_Trees]) -> lookup(Index, Rest_Trees);
-lookup(Index, [Tree | Rest_Trees]) -> 
+lookup(Index, [nil | Rest_Trees]) -> lookup(Index, Rest_Trees);
+lookup(Index, [Tree | Rest_Trees]) ->
     case Index >= count(Tree) of
         true -> lookup(Index - count(Tree), Rest_Trees);
         false -> lookup_in_tree(Index, Tree)
     end.
 
-
-lookup_in_tree(Index, {node, Count, Left, Right} = _Tree) ->
-    Bitspace = (Count div 2) - 1,
-    io:format("Index: ~p~nCount: ~p~nBitspace: ~p~n~n", [Index, Count, Bitspace]),
-    case Index =< Bitspace of
-        false -> lookup_in_tree(Index - Bitspace, Right);
-        true -> lookup_in_tree(Index, Left)
+lookup_in_tree(Local_Index, {node, Count, Left, Right}) ->
+    Bitspace = Count div 2,
+    case Local_Index < Bitspace of 
+        true -> lookup_in_tree(Local_Index, Left);
+        false -> lookup_in_tree(Local_Index - Bitspace, Right)
     end;
-lookup_in_tree(_Index, {leaf, Value}) -> 
-    Value.
+lookup_in_tree(_Index, {leaf, Value}) -> Value.
+
 
 
 % Problem 2.2
+update(Index, _Value, RAL) when Index < 0 -> RAL;
+update(_Index, _Value, []) -> [];
+update(Index, Value, [nil  | Rest_Trees]) -> update(Index, Value, Rest_Trees);
+update(Index, Value, [Tree | Rest_Trees]) -> 
+    case Index >= count(Tree) of
+        true -> [Tree | update(Index - count(Tree), Value, Rest_Trees)];
+        false -> [update_in_tree(Index, Value, Tree) | Rest_Trees]
+    end.
+
+update_in_tree(Local_Index, Value, {node, Count, Left, Right}) -> 
+    Bitspace = Count div 2,
+    case Local_Index < Bitspace of
+        true -> {node, Count, update_in_tree(Local_Index, Value, Left), Right};
+        false -> {node, Count, Left, update_in_tree(Local_Index - Bitspace, Value, Right)}
+    end;
+update_in_tree(_Local_Index, New_Value, {leaf, _Old_Value}) -> {leaf, New_Value}.
 
 
 
@@ -143,26 +157,26 @@ test_ps2() ->
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Test Problem 2.2
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %RAL7 = update(7,1000,RAL7),  % Invalid Index
-    %RAL7 = update(-1,1000,RAL7), % Invalid Index
+    RAL7 = update(7,1000,RAL7),  % Invalid Index
+    RAL7 = update(-1,1000,RAL7), % Invalid Index
 
-    %RAL8 = update(0,888,RAL7),
-    %[{leaf,888},
-    % {node,2,{leaf,600},{leaf,500}},
-    % {node,4,{node,2,{leaf,400},{leaf,300}},{node,2,{leaf,200},{leaf,100}}}
-    %] = RAL8,
+    RAL8 = update(0,888,RAL7),
+    [{leaf,888},
+    {node,2,{leaf,600},{leaf,500}},
+    {node,4,{node,2,{leaf,400},{leaf,300}},{node,2,{leaf,200},{leaf,100}}}
+    ] = RAL8,
 
-    %RAL9 = update(4,333,RAL8),
-    %[{leaf,888},
-    % {node,2,{leaf,600},{leaf,500}},
-    % {node,4,{node,2,{leaf,400},{leaf,333}},{node,2,{leaf,200},{leaf,100}}}
-    %] = RAL9,
+    RAL9 = update(4,333,RAL8),
+    [{leaf,888},
+    {node,2,{leaf,600},{leaf,500}},
+    {node,4,{node,2,{leaf,400},{leaf,333}},{node,2,{leaf,200},{leaf,100}}}
+    ] = RAL9,
 
-    %RAL10 = update(6,111,RAL9),
-    %[{leaf,888},
-    % {node,2,{leaf,600},{leaf,500}},
-    % {node,4,{node,2,{leaf,400},{leaf,333}},{node,2,{leaf,200},{leaf,111}}}
-    %] = RAL10,
+    RAL10 = update(6,111,RAL9),
+    [{leaf,888},
+    {node,2,{leaf,600},{leaf,500}},
+    {node,4,{node,2,{leaf,400},{leaf,333}},{node,2,{leaf,200},{leaf,111}}}
+    ] = RAL10,
     
     ok.
 
@@ -176,15 +190,16 @@ test_ps3() ->
     % Add test code to compare the performance of RAL with 
     % Erlang list per the instructions
 
-    %List1 = lists:seq(0,999999),
-    %start_perf(),
-    %999999 = lists:nth(1000000, List1),
-    %stop_perf("list lookup last one"),
+    List1 = lists:seq(0,999999),
+    start_perf(),
+    999999 = lists:nth(1000000, List1),
+    stop_perf("list lookup last one"),
 
     
-    %start_perf(),
-    
-    %stop_perf("ral lookup last one"),
+    RAL1 = lists:foldl(fun(Value, RAL) -> prepend(Value, RAL) end, [], lists:seq(0,999999)),
+    start_perf(),
+    999999 = lookup(1000000, RAL1),
+    stop_perf("ral lookup last one"),
 	
     % Observations (see instructions): 
 
